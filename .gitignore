@@ -1,5 +1,10 @@
 /node_modules
 /dist
+/out
+/.vscode-test
+
+# specify test directory
+/notes.code-workspace
 
 !/.vscode/*
 /.vscode/settings.json
