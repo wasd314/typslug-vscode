@@ -17,7 +17,23 @@
         "command": "typslug.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Typslug",
+      "properties": {
+        "typslug.entryFileNames": {
+          "description": "File names recognized as entries.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": [
+            "main.typ"
+          ]
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
