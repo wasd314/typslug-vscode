@@ -65,15 +65,27 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         async provideDefinition(document, position, token) {
+          const fnName =
+            vscode.workspace
+              .getConfiguration("typslug")
+              .get<string>("triggeringFunctionName") ?? "";
+          if (fnName === "") {
+            return;
+          }
+          const reBefore = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
+          const reAfter = regex(`^([^"*\\[\\]{}()!,]*)"`);
+
           const lineText = document.lineAt(position.line).text;
-          const leftPos = lineText.lastIndexOf('"', position.character - 1);
-          const rightPos = lineText.indexOf('"', position.character);
-          if (leftPos < 0 || rightPos < 0) {
+          const beforeCursor = lineText.slice(0, position.character);
+          const afterCursor = lineText.slice(position.character);
+
+          const matchBefore = reBefore.exec(beforeCursor);
+          const matchAfter = reAfter.exec(afterCursor);
+          if (matchBefore === null || matchAfter === null) {
             return;
           }
 
-          // lineText[leftPos + 1 : rightPos]
-          const slug = lineText.slice(leftPos + 1, rightPos);
+          const slug = `${matchBefore[1]}${matchAfter[1]}`;
           const uri = await slugToUri(slug);
           if (!uri) {
             return;
