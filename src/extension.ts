@@ -3,7 +3,7 @@
 
 import { regex } from "arkregex";
 import * as vscode from "vscode";
-import { getSlugs } from "./slug";
+import { getSlugs, slugToUri } from "./slug";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -56,6 +56,31 @@ export function activate(context: vscode.ExtensionContext) {
         },
       },
       '"',
+    ),
+
+    vscode.languages.registerDefinitionProvider(
+      {
+        language: "typst",
+        scheme: "file",
+      },
+      {
+        async provideDefinition(document, position, token) {
+          const lineText = document.lineAt(position.line).text;
+          const leftPos = lineText.lastIndexOf('"', position.character - 1);
+          const rightPos = lineText.indexOf('"', position.character);
+          if (leftPos < 0 || rightPos < 0) {
+            return;
+          }
+
+          // lineText[leftPos + 1 : rightPos]
+          const slug = lineText.slice(leftPos + 1, rightPos);
+          const uri = await slugToUri(slug);
+          if (!uri) {
+            return;
+          }
+          return new vscode.Location(uri, new vscode.Position(0, 0));
+        },
+      },
     ),
   );
 }

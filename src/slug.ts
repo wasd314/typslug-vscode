@@ -29,3 +29,27 @@ export const getSlugs = async (slugPrefix: string) => {
     uri.fsPath.slice(sliceLeft).replace(/[/\\][^/\\]+$/, ""),
   );
 };
+
+export const slugToUri = async (slug: string) => {
+  const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
+  if (!workspaceRoot) {
+    return;
+  }
+  const slugRootRaw = vscode.workspace
+    .getConfiguration("typslug")
+    .get<string>("slugRootPath", "");
+  const slugRoot = vscode.Uri.joinPath(workspaceRoot, slugRootRaw);
+
+  const entryFileName = vscode.workspace
+    .getConfiguration("typslug")
+    .get<string>("entryFileName", "main.typ");
+  const pattern = new vscode.RelativePattern(
+    slugRoot,
+    `${slug}/${entryFileName}`,
+  );
+  const uris = await vscode.workspace.findFiles(pattern, undefined, 1);
+  if (uris.length === 0) {
+    return;
+  }
+  return uris[0];
+};
