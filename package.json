@@ -1,5 +1,5 @@
 {
-  "name": "typslug-vscode",
+  "name": "typslug",
   "displayName": "Typslug",
   "description": "Assisting with note-taking in Typst",
   "version": "0.0.1",
@@ -14,7 +14,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "typslug-vscode.helloWorld",
+        "command": "typslug.helloWorld",
         "title": "Hello World"
       }
     ]
