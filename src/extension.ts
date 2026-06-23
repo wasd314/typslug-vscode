@@ -1,5 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+
+import { regex } from "arkregex";
 import * as vscode from "vscode";
 import { getSlugs } from "./slug";
 
@@ -41,10 +43,10 @@ export function activate(context: vscode.ExtensionContext) {
               .getConfiguration("typslug")
               .get<string>("triggeringFunctionName") ?? "";
           // reject glob
-          const re = new RegExp(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
+          const re = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
           const match = re.exec(beforeCursor);
           if (fnName === "" || match === null) {
-            return undefined;
+            return;
           }
           const slugPrefix = match[1];
 
