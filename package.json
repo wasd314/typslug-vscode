@@ -41,6 +41,9 @@
       }
     }
   },
+  "extensionDependencies": [
+    "myriad-dreamin.tinymist"
+  ],
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
