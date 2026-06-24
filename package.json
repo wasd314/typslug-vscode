@@ -36,7 +36,12 @@
         "typslug.slugRootPath": {
           "description": "Relative path to the root of slugs from the workspace root folder.",
           "type": "string",
-          "default": "."
+          "default": ""
+        },
+        "typslug.templateFilePath": {
+          "description": "Relative path to the template file from the workspace root folder.",
+          "type": "string",
+          "default": ".typslug/template.typ"
         }
       }
     }
@@ -71,6 +76,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "arkregex": "^0.0.6"
+    "arkregex": "^0.0.6",
+    "date-fns": "^4.4.0"
   }
 }

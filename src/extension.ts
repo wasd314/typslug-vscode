@@ -2,8 +2,10 @@
 // Import the module and reference it with the alias vscode in your code below
 
 import { regex } from "arkregex";
+import { formatISO } from "date-fns";
 import * as vscode from "vscode";
 import { getSlugs, slugToUri } from "./slug";
+import { generateContent } from "./templateGenerator";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -21,7 +23,13 @@ export function activate(context: vscode.ExtensionContext) {
       // Display a message box to the user
       // vscode.window.showInformationMessage("Hello, World from Typslug!");
       vscode.window.showWarningMessage("Hello, World from Typslug!");
-      console.log(await getSlugs(""));
+      // console.log(await getSlugs(""));
+      const wr = vscode.workspace.workspaceFolders?.[0].uri;
+      if (wr) {
+        const content = await generateContent(wr, "hello/world");
+        console.log(`[${content}]`);
+      }
+
       // vscode.window.showErrorMessage("Hello, World from Typslug!");
     },
   );

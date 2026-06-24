@@ -15,7 +15,7 @@ export const getSlugs = async (slugPrefix: string) => {
     .getConfiguration("typslug")
     .get<string>("entryFileName", "main.typ");
 
-  // "...aaa" => "...aaa*/**/", "...aaa/" => "...aaa/**/"
+  // "...aaa|" => "...aaa*/**/", "...aaa/|" => "...aaa/**/"
   const prefixPart = `${slugPrefix}${slugPrefix.endsWith("/") ? "" : "*/"}`;
   const pattern = new vscode.RelativePattern(
     slugRoot,
