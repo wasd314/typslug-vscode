@@ -43,23 +43,53 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         provideCompletionItems(document, position, token, context) {
-          const beforeCursor = document.getText(
-            new vscode.Range(position.with(undefined, 0), position),
-          );
-          const fnName =
-            vscode.workspace
-              .getConfiguration("typslug")
-              .get<string>("triggeringFunctionName") ?? "";
-          // reject glob
-          const re = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
-          const match = re.exec(beforeCursor);
-          if (fnName === "" || match === null) {
+          const fnName = vscode.workspace
+            .getConfiguration("typslug")
+            .get<string>("triggeringFunctionName");
+          if (!fnName) {
             return;
           }
-          const slugPrefix = match[1];
 
-          return getSlugs(slugPrefix).then((f) =>
-            f.map((slug) => new vscode.CompletionItem(slug)),
+          // reject glob
+          const reBefore = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
+          const reAfter = regex(`^([^"*\\[\\]{}()!,]*)"`);
+
+          const lineText = document.lineAt(position.line).text;
+          const beforeCursor = lineText.slice(0, position.character);
+          const afterCursor = lineText.slice(position.character);
+
+          const matchBefore = reBefore.exec(beforeCursor);
+          const matchAfter = reAfter.exec(afterCursor);
+          if (matchBefore === null) {
+            return;
+          }
+
+          const slugBefore = matchBefore[1];
+          const slugAfterLength =
+            matchAfter === null ? 0 : matchAfter[1].length;
+          const replaceRange = new vscode.Range(
+            position.with({
+              character: position.character - slugBefore.length,
+            }),
+            position.with({
+              character: position.character + slugAfterLength,
+            }),
+          );
+
+          return getSlugs("").then((f) =>
+            f.map(({ uri, slug }) => {
+              const item = new vscode.CompletionItem(
+                {
+                  label: slug,
+                  description: "Typslug",
+                },
+                vscode.CompletionItemKind.File,
+              );
+              item.documentation = vscode.workspace.asRelativePath(uri);
+              item.insertText = `${slug}${matchAfter === null ? '"' : ""}`;
+              item.range = replaceRange;
+              return item;
+            }),
           );
         },
       },
@@ -73,11 +103,10 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         async provideDefinition(document, position, token) {
-          const fnName =
-            vscode.workspace
-              .getConfiguration("typslug")
-              .get<string>("triggeringFunctionName") ?? "";
-          if (fnName === "") {
+          const fnName = vscode.workspace
+            .getConfiguration("typslug")
+            .get<string>("triggeringFunctionName");
+          if (!fnName) {
             return;
           }
           const reBefore = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
@@ -94,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           const slug = `${matchBefore[1]}${matchAfter[1]}`;
-          const uri = await slugToUri(slug);
+          const uri = await slugToUri(slug, true);
           if (!uri) {
             return;
           }
