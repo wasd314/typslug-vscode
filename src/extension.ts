@@ -2,7 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 
 import { regex } from "arkregex";
-import { formatISO } from "date-fns";
 import * as vscode from "vscode";
 import { getSlugs, SLUG_LETTER, slugToUri, slugToUriUnchecked } from "./slug";
 import { generateContent, generateTemplate } from "./templateGenerator";
@@ -133,7 +132,6 @@ export function activate(context: vscode.ExtensionContext) {
             return;
           }
 
-          // reject glob
           const reBefore = regex(`${fnName}\\(\\s*"(${SLUG_LETTER}*)$`);
           const reAfter = regex(`^(${SLUG_LETTER}*\\s*)"`);
 
@@ -221,7 +219,10 @@ export function activate(context: vscode.ExtensionContext) {
     ),
 
     vscode.languages.registerDocumentLinkProvider(
-      { language: "typst", scheme: "file" },
+      {
+        language: "typst",
+        scheme: "file",
+      },
       {
         async provideDocumentLinks(document, token) {
           const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;

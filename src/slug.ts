@@ -61,4 +61,9 @@ export const slugToUri = async (workspaceRoot: vscode.Uri, slug: string) => {
   });
 };
 
+/**
+ * Letters allowed in slug.
+ *
+ * Prohibiting glob.
+ */
 export const SLUG_LETTER = `[^"*\\[\\]{}()!,]`;
