@@ -4,7 +4,7 @@
 import { regex } from "arkregex";
 import * as vscode from "vscode";
 import { getSlugs, SLUG_LETTER, slugToUri, slugToUriUnchecked } from "./slug";
-import { generateContent, generateTemplate } from "./templateGenerator";
+import { generateTemplate } from "./templateGenerator";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -16,21 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   context.subscriptions.push(
-    vscode.commands.registerCommand("typslug.helloWorld", async () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      // vscode.window.showInformationMessage("Hello, World from Typslug!");
-      vscode.window.showWarningMessage("Hello, World from Typslug!");
-      // console.log(await getSlugs(""));
-      const wr = vscode.workspace.workspaceFolders?.[0].uri;
-      if (wr) {
-        const content = await generateContent(wr, "hello/world");
-        console.log(`[${content}]`);
-      }
-
-      // vscode.window.showErrorMessage("Hello, World from Typslug!");
-    }),
-
     vscode.commands.registerCommand("typslug.jumpToNote", async () => {
       const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
       if (!workspaceRoot) {

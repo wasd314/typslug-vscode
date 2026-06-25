@@ -33,14 +33,6 @@ const loadTemplate = async (workspaceRoot: vscode.Uri) => {
   }
 };
 
-export const generateContent = async (
-  workspaceRoot: vscode.Uri,
-  slug: string,
-) => {
-  const content = resolvePlaceholder(await loadTemplate(workspaceRoot), slug);
-  return content;
-};
-
 export const generateTemplate = async (
   workspaceRoot: vscode.Uri,
   slug: string,
