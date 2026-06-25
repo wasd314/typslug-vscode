@@ -103,6 +103,14 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         async provideDefinition(document, position, token) {
+          const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
+          if (!workspaceRoot) {
+            vscode.window.showErrorMessage(
+              "Error: Open the folder before executing this command.",
+            );
+            return;
+          }
+
           const fnName = vscode.workspace
             .getConfiguration("typslug")
             .get<string>("triggeringFunctionName");
@@ -123,7 +131,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           const slug = `${matchBefore[1]}${matchAfter[1]}`;
-          const uri = await slugToUri(slug, true);
+          const uri = await slugToUri(workspaceRoot, slug);
           if (!uri) {
             return;
           }
