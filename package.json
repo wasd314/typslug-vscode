@@ -4,6 +4,7 @@
   "publisher": "wasd314",
   "description": "Assisting with note-taking in Typst",
   "version": "0.1.0",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.125.0"
   },
