@@ -18,6 +18,11 @@
       {
         "command": "typslug.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "typslug.jumpToNote",
+        "title": "Typslug: Jump to a note",
+        "enablement": "workspaceFolderCount > 0"
       }
     ],
     "configuration": {

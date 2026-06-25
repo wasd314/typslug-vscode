@@ -4,8 +4,8 @@
 import { regex } from "arkregex";
 import { formatISO } from "date-fns";
 import * as vscode from "vscode";
-import { getSlugs, slugToUri } from "./slug";
-import { generateContent } from "./templateGenerator";
+import { getSlugs, slugToUri, slugToUriUnchecked } from "./slug";
+import { generateContent, generateTemplate } from "./templateGenerator";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -16,9 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand(
-    "typslug.helloWorld",
-    async () => {
+  context.subscriptions.push(
+    vscode.commands.registerCommand("typslug.helloWorld", async () => {
       // The code you place here will be executed every time your command is executed
       // Display a message box to the user
       // vscode.window.showInformationMessage("Hello, World from Typslug!");
@@ -31,9 +30,38 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       // vscode.window.showErrorMessage("Hello, World from Typslug!");
-    },
+    }),
+
+    vscode.commands.registerCommand("typslug.jumpToNote", async () => {
+      const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
+      if (!workspaceRoot) {
+        vscode.window.showErrorMessage(
+          "Error: Open the folder before executing this command.",
+        );
+        return;
+      }
+
+      const slug = await vscode.window.showInputBox({
+        placeHolder: "Select Slug or Enter New Slug...",
+        prompt: "Input the slug to jump",
+      });
+      if (!slug) {
+        return;
+      }
+      const uri = await slugToUriUnchecked(workspaceRoot, slug);
+      try {
+        await vscode.workspace.fs.stat(uri);
+      } catch {
+        const yes = `Generate "${slug}" and Jump`;
+        const answer = await vscode.window.showQuickPick([yes, "Cancel"]);
+        if (answer !== yes) {
+          return;
+        }
+        await generateTemplate(workspaceRoot, slug);
+      }
+      vscode.window.showTextDocument(uri);
+    }),
   );
-  context.subscriptions.push(disposable);
 
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
