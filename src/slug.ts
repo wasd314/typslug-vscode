@@ -1,11 +1,9 @@
 import * as vscode from "vscode";
 
-export const getSlugs = async (slugPrefix: string) => {
-  const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
-  if (!workspaceRoot) {
-    return [];
-  }
-
+export const getSlugs = async (
+  workspaceRoot: vscode.Uri,
+  slugPrefix: string,
+) => {
   const slugRootRaw = vscode.workspace
     .getConfiguration("typslug")
     .get<string>("slugRootPath", "");

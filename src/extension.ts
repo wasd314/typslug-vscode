@@ -75,6 +75,11 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         provideCompletionItems(document, position, token, context) {
+          const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
+          if (!workspaceRoot) {
+            return;
+          }
+
           const fnName = vscode.workspace
             .getConfiguration("typslug")
             .get<string>("triggeringFunctionName");
@@ -108,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
             }),
           );
 
-          return getSlugs("").then((f) =>
+          return getSlugs(workspaceRoot, "").then((f) =>
             f.map(({ uri, slug }) => {
               const item = new vscode.CompletionItem(
                 {
