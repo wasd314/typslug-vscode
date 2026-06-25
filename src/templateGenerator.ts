@@ -4,8 +4,8 @@ import * as vscode from "vscode";
 const resolvePlaceholder = (text: string, slug: string) => {
   const variables: Record<string, string> = {
     slug,
-    datetime: formatISO(new Date()),
-    date: formatISO(new Date(), { representation: "date" }),
+    creationDatetime: formatISO(new Date()),
+    creationDate: formatISO(new Date(), { representation: "date" }),
   };
 
   // 未知変数はそのまま残す
@@ -17,7 +17,7 @@ const resolvePlaceholder = (text: string, slug: string) => {
 
 const fallbackTemplate = `\
 // slug: {{slug}}
-// created at: {{datetime}}
+// created at: {{creationDatetime}}
 `;
 
 const loadTemplate = async (workspaceRoot: vscode.Uri) => {

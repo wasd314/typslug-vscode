@@ -28,7 +28,7 @@
     "commands": [
       {
         "command": "typslug.jumpToNote",
-        "title": "Typslug: Jump to a note",
+        "title": "Typslug: Jump to Note",
         "enablement": "workspaceFolderCount > 0"
       }
     ],
