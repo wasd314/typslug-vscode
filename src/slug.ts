@@ -25,12 +25,15 @@ export const getSlugs = async (slugPrefix: string) => {
   const uris = await vscode.workspace.findFiles(pattern);
   // +1: `/` after slugRootPath
   const sliceLeft = slugRoot.fsPath.length + 1;
-  return uris.map((uri) =>
-    uri.fsPath.slice(sliceLeft).replace(/[/\\][^/\\]+$/, ""),
-  );
+  return uris.map((uri) => {
+    return {
+      uri,
+      slug: uri.fsPath.slice(sliceLeft).replace(/[/\\][^/\\]+$/, ""),
+    };
+  });
 };
 
-export const slugToUri = async (slug: string) => {
+export const slugToUri = async (slug: string, checkExistence: boolean) => {
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
   if (!workspaceRoot) {
     return;
@@ -38,18 +41,22 @@ export const slugToUri = async (slug: string) => {
   const slugRootRaw = vscode.workspace
     .getConfiguration("typslug")
     .get<string>("slugRootPath", "");
-  const slugRoot = vscode.Uri.joinPath(workspaceRoot, slugRootRaw);
-
   const entryFileName = vscode.workspace
     .getConfiguration("typslug")
     .get<string>("entryFileName", "main.typ");
-  const pattern = new vscode.RelativePattern(
-    slugRoot,
-    `${slug}/${entryFileName}`,
+  const uri = vscode.Uri.joinPath(
+    workspaceRoot,
+    slugRootRaw,
+    slug,
+    entryFileName,
   );
-  const uris = await vscode.workspace.findFiles(pattern, undefined, 1);
-  if (uris.length === 0) {
-    return;
+
+  if (checkExistence) {
+    try {
+      await vscode.workspace.fs.stat(uri);
+    } catch {
+      return;
+    }
   }
-  return uris[0];
+  return uri;
 };
