@@ -105,9 +105,6 @@ export function activate(context: vscode.ExtensionContext) {
         async provideDefinition(document, position, token) {
           const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
           if (!workspaceRoot) {
-            vscode.window.showErrorMessage(
-              "Error: Open the folder before executing this command.",
-            );
             return;
           }
 
@@ -146,9 +143,6 @@ export function activate(context: vscode.ExtensionContext) {
         async provideDocumentLinks(document, token) {
           const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
           if (!workspaceRoot) {
-            vscode.window.showErrorMessage(
-              "Error: Open the folder before executing this command.",
-            );
             return;
           }
           const fnName = vscode.workspace
