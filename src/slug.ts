@@ -62,3 +62,5 @@ export const slugToUri = async (workspaceRoot: vscode.Uri, slug: string) => {
     }
   });
 };
+
+export const SLUG_LETTER = `[^"*\\[\\]{}()!,]`;

@@ -4,7 +4,7 @@
 import { regex } from "arkregex";
 import { formatISO } from "date-fns";
 import * as vscode from "vscode";
-import { getSlugs, slugToUri, slugToUriUnchecked } from "./slug";
+import { getSlugs, SLUG_LETTER, slugToUri, slugToUriUnchecked } from "./slug";
 import { generateContent, generateTemplate } from "./templateGenerator";
 
 // This method is called when your extension is activated
@@ -83,8 +83,8 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           // reject glob
-          const reBefore = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
-          const reAfter = regex(`^([^"*\\[\\]{}()!,]*)"`);
+          const reBefore = regex(`${fnName}\\(\\s*"(${SLUG_LETTER}*)$`);
+          const reAfter = regex(`^(${SLUG_LETTER}*\\s*)"`);
 
           const lineText = document.lineAt(position.line).text;
           const beforeCursor = lineText.slice(0, position.character);
@@ -146,8 +146,8 @@ export function activate(context: vscode.ExtensionContext) {
           if (!fnName) {
             return;
           }
-          const reBefore = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]*)$`);
-          const reAfter = regex(`^([^"*\\[\\]{}()!,]*)"`);
+          const reBefore = regex(`${fnName}\\(\\s*"(${SLUG_LETTER}*)$`);
+          const reAfter = regex(`^(${SLUG_LETTER}*)"\\s*`);
 
           const lineText = document.lineAt(position.line).text;
           const beforeCursor = lineText.slice(0, position.character);
@@ -183,7 +183,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (!fnName) {
             return;
           }
-          const re = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]+)"\\)`, "g");
+          const re = regex(`${fnName}\\(\\s*"(${SLUG_LETTER}+)"\\s*\\)`, "g");
           const links = [];
 
           const text = document.getText();
