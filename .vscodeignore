@@ -5,6 +5,8 @@ node_modules/**
 src/**
 .gitignore
 .yarnrc
+notes.code-workspace
+biome.json
 webpack.config.js
 vsc-extension-quickstart.md
 **/tsconfig.json
