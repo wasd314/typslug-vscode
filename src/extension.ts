@@ -139,6 +139,51 @@ export function activate(context: vscode.ExtensionContext) {
         },
       },
     ),
+
+    vscode.languages.registerDocumentLinkProvider(
+      { language: "typst", scheme: "file" },
+      {
+        async provideDocumentLinks(document, token) {
+          const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri;
+          if (!workspaceRoot) {
+            vscode.window.showErrorMessage(
+              "Error: Open the folder before executing this command.",
+            );
+            return;
+          }
+          const fnName = vscode.workspace
+            .getConfiguration("typslug")
+            .get<string>("triggeringFunctionName");
+          if (!fnName) {
+            return;
+          }
+          const re = regex(`${fnName}\\(\\s*"([^"*\\[\\]{}()!,]+)"\\)`, "g");
+          const links = [];
+
+          const text = document.getText();
+          while (true) {
+            const match = re.exec(text);
+            if (match === null) {
+              break;
+            }
+            const slug = match[1];
+            const slugStart = match.index + match[0].indexOf(slug);
+            const begin = document.positionAt(slugStart);
+            const end = document.positionAt(slugStart + match[1].length);
+            const uri = await slugToUri(workspaceRoot, slug);
+            if (!uri) {
+              continue;
+            }
+            const link = new vscode.DocumentLink(
+              new vscode.Range(begin, end),
+              uri,
+            );
+            links.push(link);
+          }
+          return links;
+        },
+      },
+    ),
   );
 }
 
