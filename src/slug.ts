@@ -33,28 +33,6 @@ export const getSlugs = async (slugPrefix: string) => {
   });
 };
 
-export const slugToUri = async (workspaceRoot: vscode.Uri, slug: string) => {
-  const slugRootRaw = vscode.workspace
-    .getConfiguration("typslug")
-    .get<string>("slugRootPath", "");
-  const entryFileName = vscode.workspace
-    .getConfiguration("typslug")
-    .get<string>("entryFileName", "main.typ");
-  const uri = vscode.Uri.joinPath(
-    workspaceRoot,
-    slugRootRaw,
-    slug,
-    entryFileName,
-  );
-
-  try {
-    await vscode.workspace.fs.stat(uri);
-    return uri;
-  } catch {
-    return;
-  }
-};
-
 export const slugToUriUnchecked = async (
   workspaceRoot: vscode.Uri,
   slug: string,
@@ -72,4 +50,15 @@ export const slugToUriUnchecked = async (
     entryFileName,
   );
   return uri;
+};
+
+export const slugToUri = async (workspaceRoot: vscode.Uri, slug: string) => {
+  return slugToUriUnchecked(workspaceRoot, slug).then(async (uri) => {
+    try {
+      await vscode.workspace.fs.stat(uri);
+      return uri;
+    } catch {
+      return;
+    }
+  });
 };
