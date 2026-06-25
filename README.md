@@ -1,71 +1,95 @@
-# typslug-vscode README
+# Typslug
 
-This is the README for your extension "typslug-vscode". After writing up a brief description, we recommend including the following sections.
+A VS Code extension to assist with note-taking in Typst.
+
+Typst でメモを取ることを支援する VS Code 拡張機能．
+
+https://zenn.dev/monaqa/articles/2024-12-25-typst-as-a-memo-tool を参考にしています．
+
+
+## Directory Structure
+
+Typslug では次のようなディレクトリ構造で `(typslug_root)` 以下にメモを配置していきます．
+
+```
+(workspace_root)/
+└── (typslug_root)/
+    ├── .typslug/
+    │   └── template.typ
+    ├── math/
+    │   └── number_theory/
+    │       └── main.typ
+    ├── rust/
+    │   ├── trpl/
+    │   │   └── main.typ
+    │   └── macro_rules/
+    │       └── main.typ
+    └── typst/
+        └── packages/
+            ├── suiji/
+            │   └── main.typ
+            └── touying/
+                └── main.typ
+```
+
+メモごとに葉ディレクトリを1つ用意します．`(typslug_root)` から `main.typ` の親ディレクトリへの相対パスを **slug** と呼んで，これを各メモの識別子とします．例えば上の例では，次の5つの slug があります．
+
+- `math/number_theory`
+- `rust/trpl`
+- `rust/macro_rules`
+- `typst/packages/suiji`
+- `typst/packages/touying`
+
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### コマンド `Typslug: Jump to Note`
 
-For example if there is an image subfolder under your extension project workspace:
+入力した slug に対応するメモを開きます．存在しない場合テンプレートに基づき生成します．
 
-\!\[feature X\]\(images/feature-x.png\)
+テンプレートには次のプレースホルダーを用いることができます．これらは生成時に文字列置換によって挿入されます．
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- `{{slug}}`
+    - slug
+- `{{creationDatetime}}`
+    - 生成日時（`YYYY-MM-DDThh:mm:ssZ`）
+- `{{creationDate}}`
+    - 生成日（`YYYY-MM-DD`）
 
-## Requirements
+### slug サポート
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+特定関数の第1引数を slug とみなし，次の機能を提供します．
+
+- 既存 slug の Auto Completion
+- slug のリンク化
+- Goto Definition で slug に対応するメモへのジャンプ
+
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+以下の項目を設定可能です．
 
-For example:
+- `typslug.entryFileName`
+    - メモの主たるファイル名
+- `typslug.triggeringFunctionName`
+    - slug を引数に取る関数名．この引数の slug に対してリンク化，補完，ジャンプを提供します．
+- `typslug.slugRootPath`
+    - `(workspace_root)` から `(typslug_root)` への相対パス
+    - 空文字列は `.` とみなされます
+- `typslug.templateFilePath`
+    - `(workspace_root)` からテンプレートファイルへの相対パス
 
-This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Dependencies
 
-## Known Issues
+[Tinymist Typst](https://marketplace.visualstudio.com/items?itemName=myriad-dreamin.tinymist) が有効であることを前提としています．
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+See [CHANGELOG](./CHANGELOG.md).
 
-### 1.0.0
+### 0.1.0
 
-Initial release of ...
+Initial release of Typslug.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
