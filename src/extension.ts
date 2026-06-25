@@ -49,6 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
         ({ uri, slug }) => ({
           label: slug,
           description: vscode.workspace.asRelativePath(uri),
+          // 入力を連続部分列として含むもの以外隠されてしまうので，fuzzy match するものも強制表示する
+          alwaysShow: true,
         }),
       );
 
@@ -57,17 +59,35 @@ export function activate(context: vscode.ExtensionContext) {
       qp.placeholder = "Select Slug or Enter New Slug...";
       qp.items = existingItems;
 
+      const fuzzyMatch = (pattern: string, str: string) => {
+        // pattern が str の（連続とは限らない）部分列であるか
+        let pi = 0;
+        for (let si = 0; si < str.length && pi < pattern.length; si++) {
+          if (pattern[pi].toLowerCase() === str[si].toLowerCase()) {
+            pi++;
+          }
+        }
+        return pi === pattern.length;
+      };
+
       qp.onDidChangeValue((value) => {
         const newSlug = value.trim();
-        const newItem = {
-          label: newSlug,
-          description: `Generate "${newSlug}"`,
-          alwaysShow: true,
-        };
-        qp.items =
-          isExisting(newSlug) || !newSlug
-            ? existingItems
-            : [...existingItems, newItem];
+        const filtered = newSlug
+          ? existingItems.filter((item) => fuzzyMatch(newSlug, item.label))
+          : existingItems;
+
+        if (!newSlug || isExisting(newSlug)) {
+          qp.items = filtered;
+        } else {
+          qp.items = [
+            ...filtered,
+            {
+              label: newSlug,
+              description: `Generate "${newSlug}"`,
+              alwaysShow: true,
+            },
+          ];
+        }
       }, disposables);
 
       qp.onDidAccept(async () => {
