@@ -41,33 +41,59 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const slug = await vscode.window.showInputBox({
-        placeHolder: "Select Slug or Enter New Slug...",
-        prompt: "Input the slug to jump",
-      });
-      if (!slug) {
-        return;
-      }
-      const uri = await slugToUriUnchecked(workspaceRoot, slug);
-      try {
-        await vscode.workspace.fs.stat(uri);
-      } catch {
-        // File Not Found
-        const yes = "Generate and Jump";
-        const answer = await vscode.window.showQuickPick([
-          { label: yes, detail: `Generate "${slug}" from Template and Jump` },
-          { label: "Cancel" },
-        ]);
-        if (answer?.label !== yes) {
+      const disposables: vscode.Disposable[] = [];
+      const existingSlugs = await getSlugs(workspaceRoot, "");
+      const isExisting = (slug: string) =>
+        existingSlugs.some(({ slug: s }) => s === slug);
+      const existingItems: vscode.QuickPickItem[] = existingSlugs.map(
+        ({ uri, slug }) => ({
+          label: slug,
+          description: vscode.workspace.asRelativePath(uri),
+        }),
+      );
+
+      const qp = vscode.window.createQuickPick();
+      qp.prompt = "Input the slug to jump";
+      qp.placeholder = "Select Slug or Enter New Slug...";
+      qp.items = existingItems;
+
+      qp.onDidChangeValue((value) => {
+        const newSlug = value.trim();
+        const newItem = {
+          label: newSlug,
+          description: `Generate "${newSlug}"`,
+          alwaysShow: true,
+        };
+        qp.items =
+          isExisting(newSlug) || !newSlug
+            ? existingItems
+            : [...existingItems, newItem];
+      }, disposables);
+
+      qp.onDidAccept(async () => {
+        const selected = qp.selectedItems[0];
+        if (!selected) {
+          qp.hide();
           return;
         }
-        await generateTemplate(workspaceRoot, slug);
-      }
-      vscode.window.showTextDocument(uri);
-    }),
-  );
+        const slug = selected.label;
+        if ((await slugToUri(workspaceRoot, slug)) === undefined) {
+          await generateTemplate(workspaceRoot, slug);
+        }
+        vscode.window.showTextDocument(
+          await slugToUriUnchecked(workspaceRoot, slug),
+        );
+        qp.hide();
+      }, disposables);
 
-  context.subscriptions.push(
+      qp.onDidHide(() => {
+        qp.dispose();
+        disposables.forEach((d) => d.dispose());
+      }, disposables);
+
+      qp.show();
+    }),
+
     vscode.languages.registerCompletionItemProvider(
       {
         language: "typst",
