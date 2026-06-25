@@ -10,6 +10,16 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "typst",
+    "typ",
+    "note",
+    "note-taking"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wasd314/typslug-vscode.git"
+  },
   "activationEvents": [
     "onLanguage:typst"
   ],
