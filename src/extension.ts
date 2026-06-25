@@ -52,9 +52,13 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         await vscode.workspace.fs.stat(uri);
       } catch {
-        const yes = `Generate "${slug}" and Jump`;
-        const answer = await vscode.window.showQuickPick([yes, "Cancel"]);
-        if (answer !== yes) {
+        // File Not Found
+        const yes = "Generate and Jump";
+        const answer = await vscode.window.showQuickPick([
+          { label: yes, detail: `Generate "${slug}" from Template and Jump` },
+          { label: "Cancel" },
+        ]);
+        if (answer?.label !== yes) {
           return;
         }
         await generateTemplate(workspaceRoot, slug);
