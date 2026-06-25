@@ -1,6 +1,7 @@
 {
   "name": "typslug",
   "displayName": "Typslug",
+  "publisher": "wasd314",
   "description": "Assisting with note-taking in Typst",
   "version": "0.0.1",
   "engines": {
